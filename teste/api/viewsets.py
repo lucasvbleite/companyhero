@@ -8,30 +8,38 @@ from django_filters import rest_framework as filters
 
 class EmpresaViewSet(viewsets.ModelViewSet):
     serializer_class = EmpresaSerializer
-    queryset = Empresa.objects.all()
+    queryset = Empresa.objects.all().order_by('nome')  
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        if (data["nome"] == ''):
+        
+        nome = data["nome"]
+        
+        if (nome == ''):
             raise ParseError(detail="Favor inserir um nome", code=400)
-        obj_empresa = Empresa.objects.create(nome=data["nome"])
+        
+        obj_empresa = Empresa.objects.create(nome=nome)
         obj_empresa.save()
+        
         serializer = EmpresaSerializer(obj_empresa)
-
+        
         return Response(serializer.data)
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     serializer_class = UsuarioSerializer
-    queryset = Usuario.objects.all()
+    queryset = Usuario.objects.all().order_by('username')
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_fields = ['username']
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        if (data["username"] == ''):
+        username = data["username"]
+        
+        if (username == ''):
             raise ParseError(detail="Favor inserir um nome", code=400)
-        obj_usuario = Usuario.objects.create(username=data["username"])
+        
+        obj_usuario = Usuario.objects.create(username=username)
         obj_usuario.save()
 
         for empresa in data["empresas"]:
@@ -42,7 +50,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
                     detail=f"Empresa {empresa['id']} não encontrada", code=404)
             obj_usuario.empresas.add(obj_empresa)
 
-        print(obj_usuario.empresas)
         serializer = UsuarioSerializer(obj_usuario)
 
         return Response(serializer.data)

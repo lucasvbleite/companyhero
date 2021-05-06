@@ -2,9 +2,11 @@ from rest_framework import serializers
 from .models import *
 
 class EmpresaSerializer(serializers.ModelSerializer):
+    usuarios = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    
     class Meta:
         model = Empresa
-        fields = '__all__'
+        fields = ['nome', 'usuarios']
         
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
