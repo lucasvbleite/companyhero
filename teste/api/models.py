@@ -9,7 +9,7 @@ class Empresa(models.Model):
     
 class Usuario(models.Model):
     username = models.CharField(max_length=50)
-    empresa = models.ManyToManyField("api.Empresa")
+    empresas = models.ManyToManyField("api.Empresa")
     
     def __str__(self):
         return self.username
