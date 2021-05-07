@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ParseError
 from .models import *
@@ -23,7 +23,7 @@ class EmpresaViewSet(viewsets.ModelViewSet):
         
         serializer = EmpresaSerializer(obj_empresa)
         
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -39,17 +39,22 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         if (username == ''):
             raise ParseError(detail="Favor inserir um nome", code=400)
         
+        if Usuario.objects.filter(username=username).exists():
+            return Response({"detail":"Usuário existente, escolha outro nome"}, status=status.HTTP_409_CONFLICT)
+                
         obj_usuario = Usuario.objects.create(username=username)
         obj_usuario.save()
-
-        for empresa in data["empresas"]:
-            try:
-                obj_empresa = Empresa.objects.get(id=empresa["id"])
-            except:
-                raise NotFound(
-                    detail=f"Empresa {empresa['id']} não encontrada", code=404)
-            obj_usuario.empresas.add(obj_empresa)
+        
+        if ("empresas" in data):
+            for empresa in data["empresas"]:
+                empresa_id = int(empresa["id"])
+                try:
+                    obj_empresa = Empresa.objects.get(id=empresa_id)
+                except:
+                    raise NotFound(
+                        detail=f"Empresa {empresa_id} não encontrada", code=404)
+                obj_usuario.empresas.add(obj_empresa)
 
         serializer = UsuarioSerializer(obj_usuario)
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
