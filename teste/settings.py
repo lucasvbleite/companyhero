@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'api',
+    'gunicorn',
 ]
 
 MIDDLEWARE = [
@@ -78,8 +79,12 @@ WSGI_APPLICATION = 'teste.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dfidvnht51m10',
+        'USER': 'stgpxybfqfrznl',
+        'PASSWORD': '4317180765763df4ac0d77d768bf4da32eeb47fe596d06dccdd68217d01b615d',
+        'HOST': 'ec2-54-87-112-29.compute-1.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
